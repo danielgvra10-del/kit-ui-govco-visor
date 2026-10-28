@@ -1,0 +1,6 @@
+[
+  {"id": "logo-tic", "name": "Logo TIC (MinTIC)", "page": 1, "rect": [193.34, 90.29, 65.87, 128.08]},
+  {"id": "logo-govco", "name": "Logo GOV.CO", "page": 1, "rect": [1143.0, 131.67, 218.22, 59.5]},
+  {"id": "logo-govco-blanco", "name": "Logo GOV.CO (blanco, barra superior)", "page": 9, "rect": [48.41, 8.62, 119.02, 32.45], "bg": "#0943B5"},
+  {"id": "logo-and", "name": "Logo AND (Agencia Nacional Digital)", "page": 1, "rect": [1304.0, 904.68, 73.59, 112.58]}
+]

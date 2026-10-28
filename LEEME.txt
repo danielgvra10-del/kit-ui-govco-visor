@@ -1,0 +1,15 @@
+VISOR KIT UI GOV.CO 9.2 — herramienta NO OFICIAL de consulta para el equipo
+Fuente: PDF oficial del MinTIC (https://www.mintic.gov.co/portal/715/articles-406089_recurso_1.pdf)
+
+IMPORTANTE: no abras index.html con doble clic. El navegador bloquea la carga de los
+datos cuando la página se abre como archivo. Usa una de estas opciones:
+
+1) En Windows con Python instalado: doble clic en "abrir-visor.bat".
+   Se abre http://localhost:8765/ en el navegador. Cierra la ventana negra para detenerlo.
+
+2) En cualquier equipo con Python:  python -m http.server 8765
+   (dentro de esta carpeta) y abre http://localhost:8765/
+
+3) Para tener un enlace web: sube esta carpeta completa a cualquier hosting de archivos
+   estáticos (GitHub Pages, Netlify, el servidor web de la entidad, etc.). No necesita
+   base de datos ni servidor especial.

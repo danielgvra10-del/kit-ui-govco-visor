@@ -1,0 +1,961 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Kit UI GOV.CO 9.2 Specs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Montserrat:wght@400;500;600;700&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;0,800;1,600&family=Nunito:wght@600&display=swap">
+<style>
+/* Layout: herramienta de inspección a pantalla completa — barra superior, lista de mesas | lienzo | inspector (como XD Design Specs) */
+:root {
+  --bg: #E9ECF1;          /* fondo del lienzo */
+  --panel: #FFFFFF;
+  --panel-2: #F5F6F9;
+  --line: #D9DDE5;
+  --fg: #1D2330;
+  --muted: #5B6475;
+  --accent: #1473E6;       /* selección (convención de XD) */
+  --accent-soft: #E3EEFC;
+  --measure: #E5326D;      /* líneas de distancia */
+  --warn-bg: #FFF4D6;
+  --warn-fg: #6B4E00;
+  --ok: #157A47;
+  --font-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15181E; --panel: #1E222A; --panel-2: #252A33; --line: #343B47; --fg: #E7EAF0; --muted: #9AA3B2;
+    --accent: #4C9BFF; --accent-soft: #1E3350; --measure: #FF5C8F; --warn-bg: #3A3014; --warn-fg: #F2D48A; --ok: #4CC38A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15181E; --panel: #1E222A; --panel-2: #252A33; --line: #343B47; --fg: #E7EAF0; --muted: #9AA3B2;
+  --accent: #4C9BFF; --accent-soft: #1E3350; --measure: #FF5C8F; --warn-bg: #3A3014; --warn-fg: #F2D48A; --ok: #4CC38A;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--panel); color: var(--fg); font: 13px/1.45 var(--font-ui); overflow: hidden; }
+* { box-sizing: border-box; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.app { height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* barra superior */
+.top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding-block: 8px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.brand b { font-weight: 600; font-size: 14px; }
+.brand span { color: var(--muted); font-size: 11px; }
+.tabs { display: flex; gap: 2px; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r); padding: 2px; }
+.tabs button { border: 0; background: none; padding: 4px 12px; border-radius: 4px; color: var(--muted); }
+.tabs button[aria-pressed="true"] { background: var(--panel); color: var(--fg); box-shadow: 0 0 0 1px var(--line); font-weight: 500; }
+.nav { display: flex; align-items: center; gap: 6px; margin-inline: auto; min-width: 0; }
+.nav .t { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 32ch; }
+.nav .c { color: var(--muted); font-variant-numeric: tabular-nums; }
+.ib { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r); min-width: 28px; height: 28px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.ib:hover { border-color: var(--muted); }
+.ib.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.zoom { display: flex; align-items: center; gap: 4px; }
+.zoom output { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums; }
+.notice { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--warn-bg); color: var(--warn-fg); font-size: 12px; padding-block: 5px; padding-inline: 10px; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.notice a { color: inherit; font-weight: 600; }
+
+/* zona principal */
+.main { display: grid; grid-template-columns: 248px minmax(0, 1fr) 320px; min-height: 0; }
+.main.res { grid-template-columns: 200px minmax(0, 1fr); }
+.side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--panel); }
+.side header { padding: 10px 10px 8px 0; display: flex; gap: 6px; }
+.side header input { flex: 1; min-width: 0; height: 28px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel-2); padding: 0 8px; }
+.list { overflow: auto; padding: 0 10px 16px 0; display: grid; gap: 10px; align-content: start; }
+.ab { display: grid; gap: 4px; border: 0; background: none; text-align: left; padding: 6px; border-radius: var(--r); }
+.ab:hover { background: var(--panel-2); }
+.ab[aria-current="true"] { background: var(--accent-soft); }
+.ab .th { width: 100%; aspect-ratio: 16/9; overflow: hidden; border-radius: 3px; border: 1px solid var(--line); background: #fff; }
+.ab .th img { width: 100%; display: block; }
+.ab .nm { font-size: 12px; display: flex; gap: 6px; }
+.ab .nm i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 2ch; }
+.ab .nm em { font-style: normal; margin-left: auto; color: var(--accent); font-size: 11px; }
+
+.stage { position: relative; overflow: auto; background: var(--bg); min-width: 0; min-height: 0; }
+.stage.region { cursor: crosshair; }
+.board { position: relative; margin: 32px auto 48px; box-shadow: 0 1px 3px rgba(0,0,0,.18); background: #fff; }
+.board .label { position: absolute; left: 0; bottom: 100%; padding-bottom: 6px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+#art, #art > svg { display: block; width: 100%; height: 100%; }
+#ov { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+.grid-all { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 24px; }
+.grid-all button { border: 0; background: none; text-align: left; display: grid; gap: 6px; padding: 0; }
+.grid-all .th { aspect-ratio: 16/10; overflow: hidden; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+.grid-all img { width: 100%; display: block; }
+
+/* inspector */
+.insp { border-left: 1px solid var(--line); overflow: auto; min-height: 0; padding: 12px 0 24px 14px; display: grid; gap: 14px; align-content: start; }
+.insp h2 { font-size: 15px; margin: 0; font-weight: 600; text-wrap: balance; }
+.insp h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 6px; font-weight: 600; }
+.kind { display: inline-block; font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+.sec { display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 12px; }
+.kv { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+.kv div { display: grid; }
+.kv dt, .kv .k { font-size: 11px; color: var(--muted); }
+.kv dd, .kv .v { margin: 0; font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sw { width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--line); flex: none; background-image: linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%); background-size: 8px 8px; background-position: 0 0, 4px 4px; position: relative; overflow: hidden; }
+.sw i { position: absolute; inset: 0; }
+.mono { font-family: var(--font-mono); font-size: 12.5px; }
+.copy { border: 0; background: none; color: var(--accent); padding: 0 2px; font-size: 12px; }
+.note { font-size: 12px; color: var(--muted); }
+.flag { font-size: 11px; background: var(--warn-bg); color: var(--warn-fg); border-radius: 3px; padding: 1px 5px; }
+pre.css { margin: 0; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 10px; font: 12px/1.5 var(--font-mono); white-space: pre-wrap; word-break: break-word; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.seg button { border: 0; background: var(--panel); padding: 2px 8px; font-size: 11px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--fg); }
+.exp { display: flex; gap: 6px; flex-wrap: wrap; }
+.exp select { height: 28px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 0 6px; }
+.itabs { display: flex; gap: 14px; border-bottom: 1px solid var(--line); }
+.itabs button { border: 0; background: none; padding: 4px 0 8px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.itabs button[aria-pressed="true"] { color: var(--fg); border-color: var(--accent); font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 20px; padding: 2px 8px 2px 3px; background: var(--panel); font-family: var(--font-mono); font-size: 11.5px; }
+.chip .sw { width: 16px; height: 16px; border-radius: 50%; }
+.tsl { display: grid; gap: 8px; }
+.tsl button { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r); text-align: left; padding: 6px 8px; display: grid; gap: 2px; }
+.tsl small { color: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+.state { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: grid; }
+.state header { display: flex; gap: 8px; align-items: baseline; padding: 6px 10px; background: var(--panel-2); }
+.state header b { font-weight: 600; }
+.state header span { color: var(--muted); font-size: 11px; }
+.state img { width: 100%; display: block; background: #fff; border-block: 1px solid var(--line); }
+.state .body { padding: 8px 10px; display: grid; gap: 6px; }
+
+/* recursos */
+.rnav { border-right: 1px solid var(--line); padding: 12px 10px 12px 0; display: grid; gap: 2px; align-content: start; }
+.rnav button { border: 0; background: none; text-align: left; padding: 6px 8px; border-radius: var(--r); display: flex; justify-content: space-between; }
+.rnav button[aria-pressed="true"] { background: var(--accent-soft); font-weight: 500; }
+.rnav i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rbody { overflow: auto; min-height: 0; padding: 16px 0 32px 20px; display: grid; gap: 16px; align-content: start; }
+.rbody h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.bar input[type=search] { height: 30px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel-2); padding: 0 10px; width: min(280px, 100%); }
+.colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.color { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: grid; background: var(--panel); text-align: left; padding: 0; }
+.color .fill { height: 64px; border-bottom: 1px solid var(--line); }
+.color .meta { padding: 6px 8px; display: grid; gap: 1px; font-family: var(--font-mono); font-size: 11.5px; }
+.color .meta span { color: var(--muted); }
+.styles { display: grid; gap: 8px; }
+.style { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; background: var(--panel); }
+.style .smp { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; min-width: 0; }
+.style small { grid-column: 1 / -1; color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+.icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.ic { position: relative; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); display: grid; place-items: center; aspect-ratio: 1; padding: 0; }
+.ic .g { width: 40px; height: 40px; display: grid; place-items: center; }
+.ic .g svg { max-width: 40px; max-height: 40px; }
+.ic span { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font: 10.5px var(--font-mono); color: var(--muted); }
+.ic input { position: absolute; top: 5px; left: 5px; margin: 0; }
+.ic[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.dark-ic .ic { background: #2a2f38; }
+.assets { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.asset { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); display: grid; gap: 8px; padding: 10px; }
+.asset .pv { height: 120px; display: grid; place-items: center; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
+.asset .pv img, .asset .pv svg { max-width: 100%; max-height: 110px; }
+.drawer { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 14px; display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px; }
+.drawer .pv { background: var(--panel-2); border-radius: 4px; display: grid; place-items: center; min-height: 140px; }
+.drawer .pv svg { width: 96px; height: 96px; }
+.toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--panel); padding: 8px 14px; border-radius: var(--r); font-size: 12.5px; z-index: 20; max-width: calc(100% - 32px); }
+.hidden-host { position: absolute; left: -100000px; top: 0; visibility: hidden; pointer-events: none; }
+textarea.out { width: 100%; min-height: 260px; font: 12px/1.5 var(--font-mono); background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r); padding: 10px; }
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .app { height: auto; min-height: 100%; }
+  .main, .main.res { grid-template-columns: minmax(0, 1fr); }
+  .side { border-right: 0; max-height: 220px; }
+  .list { grid-auto-flow: column; grid-auto-columns: 150px; overflow-x: auto; }
+  .stage { height: 62vh; }
+  .insp { border-left: 0; padding-left: 0; }
+  .rnav { border-right: 0; display: flex; flex-wrap: wrap; padding-right: 0; }
+  .rbody { padding-left: 0; }
+  .drawer { grid-template-columns: minmax(0, 1fr); }
+  .nav { margin-inline: 0; order: 3; width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) { .ab, .ib, .ic { transition: background-color .12s, border-color .12s; } }
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><b>Kit UI GOV.CO 9.2</b><span>Specs para desarrollo · 37 mesas</span></div>
+    <div class="tabs" role="group" aria-label="Vista">
+      <button id="tabBoards" aria-pressed="true">Mesas de trabajo</button>
+      <button id="tabRes" aria-pressed="false">Recursos</button>
+    </div>
+    <div class="nav" id="navBox">
+      <button class="ib" id="prev" title="Mesa anterior (←)" aria-label="Mesa anterior">‹</button>
+      <span class="c" id="navCount">–</span>
+      <span class="t" id="navTitle">Cargando…</span>
+      <button class="ib" id="next" title="Mesa siguiente (→)" aria-label="Mesa siguiente">›</button>
+    </div>
+    <div class="zoom" id="zoomBox">
+      <button class="ib" id="regionBtn" title="Seleccionar una región para exportarla (R)" aria-pressed="false">Región</button>
+      <button class="ib" id="zout" aria-label="Alejar">−</button>
+      <output id="zval">100%</output>
+      <button class="ib" id="zin" aria-label="Acercar">+</button>
+      <button class="ib" id="zfit" title="Ajustar al ancho">Ajustar</button>
+      <button class="ib" id="z100" title="Tamaño real">1:1</button>
+    </div>
+    <button class="ib primary" id="dlAll">Descargar todo (ZIP)</button>
+  </header>
+  <div class="notice" role="note">
+    <span><b>Herramienta no oficial</b> de consulta para el equipo de desarrollo. No reemplaza ni modifica el documento oficial.</span>
+    <a href="https://www.mintic.gov.co/portal/715/articles-406089_recurso_1.pdf" target="_blank" rel="noopener">PDF oficial Kit UI 9.2 (MinTIC)</a>
+    <a href="https://www.mintic.gov.co/portal/715/w3-article-406089.html" target="_blank" rel="noopener">Anuncio MinTIC</a>
+    <a href="https://xd.adobe.com/view/0a001fe4-c2d9-484a-be23-f7071c7b2d18-5f53/" target="_blank" rel="noopener">Prototipo en Adobe XD</a>
+  </div>
+
+  <div class="main" id="main">
+    <aside class="side" id="side">
+      <header>
+        <input id="q" type="search" placeholder="Buscar mesa…" aria-label="Buscar mesa de trabajo">
+        <button class="ib" id="gridBtn" title="Vista de cuadrícula" aria-pressed="false">▦</button>
+      </header>
+      <div class="list" id="list"></div>
+    </aside>
+    <section class="stage" id="stage" aria-label="Mesa de trabajo">
+      <div class="board" id="board">
+        <div class="label" id="blabel"></div>
+        <div id="art"></div>
+        <svg id="ov" aria-hidden="true"></svg>
+      </div>
+    </section>
+    <aside class="insp" id="insp" aria-label="Inspector"></aside>
+  </div>
+</div>
+<div class="hidden-host" id="host"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const r2 = v => Math.round(v * 100) / 100;
+const px = v => `${r2(v)}`.replace(/\.0+$/, "");
+const pad = n => String(n).padStart(2, "0");
+
+const S = {
+  kit: null, n: 1, page: null, z: 1, sel: null, hover: null, cycle: null,
+  color: "hex", unit: "px", view: "boards", grid: false, region: false, itab: "props",
+  states: [], logos: [], icons: null, resTab: "colors", iconSel: new Set(), iconOpen: null,
+};
+const svgCache = new Map(), jsonCache = new Map();
+let LS = null; try { LS = window.localStorage; } catch (e) { LS = null; }
+const pref = (k, v) => { try { if (v === undefined) return LS && LS.getItem("kitui." + k); LS && LS.setItem("kitui." + k, v); } catch (e) { return null; } };
+
+/* ---------------------------------------------------------------- datos */
+async function getJSON(u) { if (!jsonCache.has(u)) jsonCache.set(u, fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); })); return jsonCache.get(u); }
+async function getSVG(n) { const u = `data/svg/p${pad(n)}.svg`; if (!svgCache.has(u)) svgCache.set(u, fetch(u).then(r => r.text())); return svgCache.get(u); }
+
+/* ---------------------------------------------------------------- colores */
+function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function rgbToHsl([r, g, b]) { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0; const l = (mx + mn) / 2; if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h /= 6; } return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)]; }
+function fmtColor(hex, a = 1) {
+  if (!hex) return "—";
+  const rgb = hexToRgb(hex);
+  if (S.color === "rgb") return a < 1 ? `rgba(${rgb.join(", ")}, ${a})` : `rgb(${rgb.join(", ")})`;
+  if (S.color === "hsl") { const [h, s, l] = rgbToHsl(rgb); return a < 1 ? `hsla(${h}, ${s}%, ${l}%, ${a})` : `hsl(${h}, ${s}%, ${l}%)`; }
+  return a < 1 ? `${hex} · ${Math.round(a * 100)}%` : hex;
+}
+function cssColor(hex, a = 1) { if (a >= 1) return hex.toLowerCase(); const rgb = hexToRgb(hex); return `rgba(${rgb.join(", ")}, ${a})`; }
+const swatch = (hex, a = 1) => `<span class="sw"><i style="background:${cssColor(hex, a)}"></i></span>`;
+const L = v => S.unit === "rem" ? `${r2(v / 16)}rem` : `${px(v)}px`;
+
+/* ---------------------------------------------------------------- toast / copiar / descargar */
+let toastT;
+function toast(msg) { let t = $(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); document.body.append(t); } t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3200); }
+function copyText(txt, btn) {
+  const done = () => toast("Copiado al portapapeles");
+  try { navigator.clipboard.writeText(txt).then(done, () => fallbackCopy(txt, done)); } catch (e) { fallbackCopy(txt, done); }
+}
+function fallbackCopy(txt, done) { const ta = document.createElement("textarea"); ta.value = txt; document.body.append(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) { toast("Selecciona el texto y cópialo con Ctrl+C"); } ta.remove(); }
+let dlNs;
+function downloadsNs() {
+  if (dlNs !== undefined) return dlNs;
+  dlNs = (window.claude && typeof window.claude.use === "function") ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
+  return dlNs;
+}
+async function save(filename, data) {
+  const ns = await downloadsNs();
+  if (ns) {
+    try { await ns.save({ filename, data }); toast(`Descarga lista: ${filename}`); }
+    catch (e) { toast(e && e.code === "declined" ? "Descarga cancelada" : `No se pudo descargar (${e && e.code || "error"})`); }
+    return;
+  }
+  const blob = data instanceof Blob ? data : new Blob([data]);
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; document.body.append(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+
+/* ---------------------------------------------------------------- librerías bajo demanda */
+const LIBS = {
+  zip: ["https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js", () => window.JSZip],
+  jspdf: ["https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js", () => window.jspdf],
+  svg2pdf: ["https://cdn.jsdelivr.net/npm/svg2pdf.js@2.2.3/dist/svg2pdf.umd.min.js", () => window.svg2pdf],
+  pdflib: ["https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js", () => window.PDFLib],
+};
+const libP = {};
+function lib(name) {
+  if (!libP[name]) libP[name] = new Promise((res, rej) => {
+    const [src, get] = LIBS[name]; if (get()) return res(get());
+    const s = document.createElement("script"); s.src = src; s.onload = () => res(get()); s.onerror = () => rej(new Error("No se pudo cargar " + name)); document.head.append(s);
+  });
+  return libP[name];
+}
+
+/* ---------------------------------------------------------------- lista de mesas */
+function renderList() {
+  const q = $("#q").value.trim().toLowerCase();
+  $("#list").innerHTML = S.kit.artboards.filter(a => !q || a.name.toLowerCase().includes(q) || String(a.n) === q).map(a => {
+    const ns = S.states.filter(s => s.page === a.n).length;
+    return `<button class="ab" data-n="${a.n}" aria-current="${a.n === S.n && !S.grid}">
+      <span class="th"><img loading="lazy" src="data/thumb/p${pad(a.n)}.png" alt=""></span>
+      <span class="nm"><i>${a.n}</i>${esc(a.name)}${ns ? `<em title="Componentes con estados documentados">${ns} est.</em>` : ""}</span></button>`;
+  }).join("");
+}
+function renderGrid() {
+  $("#board").hidden = true;
+  let g = $("#gridAll"); if (!g) { g = document.createElement("div"); g.id = "gridAll"; g.className = "grid-all"; $("#stage").append(g); }
+  g.hidden = false;
+  g.innerHTML = S.kit.artboards.map(a => `<button data-n="${a.n}"><span class="th"><img loading="lazy" src="data/thumb/p${pad(a.n)}.png" alt=""></span><span>${a.n}. ${esc(a.name)} <span class="note">${a.w}×${a.h}</span></span></button>`).join("");
+  $("#navTitle").textContent = "Todas las mesas de trabajo"; $("#navCount").textContent = "37";
+  renderInspector();
+}
+
+/* ---------------------------------------------------------------- carga de una mesa */
+async function openBoard(n, keepSel) {
+  n = Math.max(1, Math.min(S.kit.artboards.length, n));
+  S.n = n; S.grid = false; $("#gridBtn").setAttribute("aria-pressed", "false");
+  if (!keepSel) { S.sel = null; S.hover = null; S.cycle = null; }
+  const g = $("#gridAll"); if (g) g.hidden = true;
+  $("#board").hidden = false;
+  const a = S.kit.artboards[n - 1];
+  $("#navTitle").textContent = a.name; $("#navCount").textContent = `${n} / ${S.kit.artboards.length}`;
+  $("#blabel").textContent = `${a.name} — ${a.w} × ${a.h}`;
+  try { history.replaceState(null, "", "#m" + n); } catch (e) { /* vista sin historial */ }
+  renderList();
+  const art = $("#art"); art.innerHTML = `<div class="loading">Cargando mesa…</div>`;
+  S.page = { ...a, els: [] };
+  applyZoom();
+  const [txt, js] = await Promise.all([getSVG(n), getJSON(`data/p${pad(n)}.json`)]);
+  if (S.n !== n) return;
+  art.innerHTML = txt;
+  const svg = art.firstElementChild; svg.removeAttribute("width"); svg.removeAttribute("height"); svg.setAttribute("preserveAspectRatio", "none");
+  S.page = { ...a, els: js.els, leaves: null };
+  for (const e of S.page.els) e.area = Math.max(e.w, 1) * Math.max(e.h, 1);
+  applyZoom(); draw(); renderInspector();
+  const el = document.querySelector(`.ab[data-n="${n}"]`); if (el) el.scrollIntoView({ block: "nearest" });
+}
+
+/* ---------------------------------------------------------------- zoom */
+function applyZoom() {
+  const p = S.page; if (!p) return;
+  const b = $("#board"); b.style.width = p.w * S.z + "px"; b.style.height = p.h * S.z + "px";
+  $("#ov").setAttribute("viewBox", `0 0 ${p.w} ${p.h}`); $("#ov").setAttribute("preserveAspectRatio", "none");
+  $("#zval").value = Math.round(S.z * 100) + "%";
+  draw();
+}
+function fitZ() { const st = $("#stage"); return Math.max(0.05, (st.clientWidth - 64) / S.page.w); }
+function setZoom(z, cx, cy) {
+  const st = $("#stage"), b = $("#board");
+  const rect = b.getBoundingClientRect(), srect = st.getBoundingClientRect();
+  cx ??= srect.left + st.clientWidth / 2; cy ??= srect.top + st.clientHeight / 2;
+  const px0 = (cx - rect.left) / S.z, py0 = (cy - rect.top) / S.z;
+  S.z = Math.min(8, Math.max(0.05, z)); applyZoom();
+  const r2b = b.getBoundingClientRect();
+  st.scrollLeft += (r2b.left + px0 * S.z) - cx; st.scrollTop += (r2b.top + py0 * S.z) - cy;
+}
+
+/* ---------------------------------------------------------------- selección */
+function toPage(ev) { const r = $("#board").getBoundingClientRect(); return [(ev.clientX - r.left) / S.z, (ev.clientY - r.top) / S.z]; }
+function hits(x, y) {
+  const t = 3 / S.z;
+  return S.page.els.filter(e => x >= e.x - t && x <= e.x + e.w + t && y >= e.y - t && y <= e.y + e.h + t)
+    .sort((a, b) => (a.area * (a.k === "text" ? .6 : 1)) - (b.area * (b.k === "text" ? .6 : 1)));
+}
+const box = e => ({ x0: e.x, y0: e.y, x1: e.x + e.w, y1: e.y + e.h });
+const contains = (A, B) => A.x0 <= B.x0 + .01 && A.y0 <= B.y0 + .01 && A.x1 >= B.x1 - .01 && A.y1 >= B.y1 - .01;
+
+function measure(A, B) {
+  const segs = [];
+  if (contains(B, A) && !(contains(A, B))) {
+    const cy = (A.y0 + A.y1) / 2, cx = (A.x0 + A.x1) / 2;
+    segs.push([B.x0, cy, A.x0, cy], [A.x1, cy, B.x1, cy], [cx, B.y0, cx, A.y0], [cx, A.y1, cx, B.y1]);
+  } else if (contains(A, B)) {
+    const cy = (B.y0 + B.y1) / 2, cx = (B.x0 + B.x1) / 2;
+    segs.push([A.x0, cy, B.x0, cy], [B.x1, cy, A.x1, cy], [cx, A.y0, cx, B.y0], [cx, B.y1, cx, A.y1]);
+  } else {
+    const oy0 = Math.max(A.y0, B.y0), oy1 = Math.min(A.y1, B.y1), ox0 = Math.max(A.x0, B.x0), ox1 = Math.min(A.x1, B.x1);
+    const yy = oy1 > oy0 ? (oy0 + oy1) / 2 : (A.y0 + A.y1) / 2, xx = ox1 > ox0 ? (ox0 + ox1) / 2 : (A.x0 + A.x1) / 2;
+    if (B.x0 >= A.x1) segs.push([A.x1, yy, B.x0, yy]); else if (A.x0 >= B.x1) segs.push([B.x1, yy, A.x0, yy]);
+    if (B.y0 >= A.y1) segs.push([xx, A.y1, xx, B.y0]); else if (A.y0 >= B.y1) segs.push([xx, B.y1, xx, A.y0]);
+    if (!segs.length) { // se superponen: distancias entre bordes
+      if (A.x0 !== B.x0) segs.push([Math.min(A.x0, B.x0), yy, Math.max(A.x0, B.x0), yy]);
+      if (A.y0 !== B.y0) segs.push([xx, Math.min(A.y0, B.y0), xx, Math.max(A.y0, B.y0)]);
+    }
+  }
+  return segs.filter(s => Math.hypot(s[2] - s[0], s[3] - s[1]) > .01);
+}
+function neighbours(sel) {
+  const A = box(sel), P = { x0: 0, y0: 0, x1: S.page.w, y1: S.page.h };
+  const parent = S.page.els.filter(e => e !== sel && e.k !== "text" && contains(box(e), A) && !contains(A, box(e))).sort((a, b) => a.area - b.area)[0];
+  const C = parent ? box(parent) : P;
+  const out = { left: [A.x0 - C.x0, parent], right: [C.x1 - A.x1, parent], top: [A.y0 - C.y0, parent], bottom: [C.y1 - A.y1, parent] };
+  for (const e of S.page.els) {
+    if (e === sel || e === parent) continue;
+    const B = box(e);
+    if (contains(B, A) || contains(A, B) || !contains(C, B)) continue;
+    const oy = Math.min(A.y1, B.y1) - Math.max(A.y0, B.y0), ox = Math.min(A.x1, B.x1) - Math.max(A.x0, B.x0);
+    if (oy > 0) { if (B.x0 >= A.x1 && B.x0 - A.x1 < out.right[0]) out.right = [B.x0 - A.x1, e]; if (B.x1 <= A.x0 && A.x0 - B.x1 < out.left[0]) out.left = [A.x0 - B.x1, e]; }
+    if (ox > 0) { if (B.y0 >= A.y1 && B.y0 - A.y1 < out.bottom[0]) out.bottom = [B.y0 - A.y1, e]; if (B.y1 <= A.y0 && A.y0 - B.y1 < out.top[0]) out.top = [A.y0 - B.y1, e]; }
+  }
+  return out;
+}
+
+/* ---------------------------------------------------------------- capa de medidas */
+function draw() {
+  const ov = $("#ov"); if (!S.page) return;
+  const k = 1 / S.z, parts = [];
+  const rect = (e, color, w, dash) => `<rect x="${e.x}" y="${e.y}" width="${Math.max(e.w, .01)}" height="${Math.max(e.h, .01)}" fill="none" stroke="${color}" stroke-width="${w * k}" ${dash ? `stroke-dasharray="${4 * k} ${3 * k}"` : ""}/>`;
+  const label = (x, y, txt, color, anchor = "middle") => {
+    const fs = 11 * k, w = (txt.length * 6.6 + 8) * k, h = 16 * k;
+    const x0 = anchor === "middle" ? x - w / 2 : x;
+    return `<g><rect x="${x0}" y="${y - h / 2}" width="${w}" height="${h}" rx="${3 * k}" fill="${color}"/><text x="${x0 + w / 2}" y="${y + fs * .36}" font-size="${fs}" font-family="IBM Plex Mono, monospace" text-anchor="middle" fill="#fff">${esc(txt)}</text></g>`;
+  };
+  const seg = (s, color) => {
+    const [x1, y1, x2, y2] = s, d = Math.hypot(x2 - x1, y2 - y1), cap = 4 * k;
+    const horiz = Math.abs(y2 - y1) < Math.abs(x2 - x1);
+    const caps = horiz ? `M${x1} ${y1 - cap}V${y1 + cap}M${x2} ${y2 - cap}V${y2 + cap}` : `M${x1 - cap} ${y1}H${x1 + cap}M${x2 - cap} ${y2}H${x2 + cap}`;
+    return `<path d="M${x1} ${y1}L${x2} ${y2}${caps}" stroke="${color}" stroke-width="${1 * k}" fill="none"/>` + label((x1 + x2) / 2 + (horiz ? 0 : 0), (y1 + y2) / 2, px(d), color);
+  };
+  if (S.region && S.region.rect) { const r = S.region.rect; parts.push(`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" fill="rgba(20,115,230,.08)" stroke="#1473E6" stroke-width="${1.5 * k}" stroke-dasharray="${5 * k} ${3 * k}"/>`); parts.push(label(r[0] + r[2] / 2, r[1] + r[3] + 12 * k, `${px(r[2])} × ${px(r[3])}`, "#1473E6")); }
+  const ms = getComputedStyle(document.documentElement).getPropertyValue("--measure").trim() || "#E5326D";
+  if (S.hover && S.hover !== S.sel) parts.push(rect(S.hover, "#1473E6", 1, !!S.sel));
+  if (S.sel) {
+    const e = S.sel;
+    parts.push(rect(e, "#1473E6", 2));
+    parts.push(label(e.x + e.w / 2, e.y + e.h + 12 * k, `${px(e.w)} × ${px(e.h)}`, "#1473E6"));
+    if (S.hover && S.hover !== S.sel) { measure(box(e), box(S.hover)).forEach(s => parts.push(seg(s, ms))); }
+    else if (S.showNb) {
+      const nb = neighbours(e), A = box(e), cx = (A.x0 + A.x1) / 2, cy = (A.y0 + A.y1) / 2;
+      const L2 = { left: [A.x0 - nb.left[0], cy, A.x0, cy], right: [A.x1, cy, A.x1 + nb.right[0], cy], top: [cx, A.y0 - nb.top[0], cx, A.y0], bottom: [cx, A.y1, cx, A.y1 + nb.bottom[0]] };
+      for (const d of Object.keys(L2)) if (nb[d][0] > .01) parts.push(seg(L2[d], ms));
+    }
+  }
+  ov.innerHTML = parts.join("");
+}
+
+/* ---------------------------------------------------------------- inspector */
+const KIND = { rect: "Rectángulo", rrect: "Rectángulo redondeado", ellipse: "Elipse", line: "Línea", path: "Trazado vectorial" };
+function kindOf(e) { return e.k === "group" ? "Componente (tabla de estados)" : e.k === "text" ? "Texto" : e.k === "image" ? "Imagen (mapa de bits)" : KIND[e.path] || "Forma"; }
+function radiusTxt(r) { if (r === 0 || r == null) return "0"; if (r === "50%") return "50%"; if (Array.isArray(r)) return r.map(v => L(v)).join(" "); return L(r); }
+function fontStack(f) {
+  const fb = { "Verdana": "Verdana, Geneva, sans-serif", "Nunito Sans": "'Nunito Sans', sans-serif", "Montserrat": "'Montserrat', sans-serif", "Nunito": "'Nunito', sans-serif", "Helvetica": "Helvetica, Arial, sans-serif" };
+  return fb[f.family] || `'${f.family}', sans-serif`;
+}
+function cssFor(e) {
+  const L0 = [];
+  if (e.k === "text") {
+    const r = e.runs[0], f = r.font;
+    if (!f.family) return "/* Fuente Type3 sin nombre en el PDF: no se puede identificar la familia */";
+    L0.push(`font-family: ${fontStack(f)};`, `font-size: ${L(r.size)};`, `font-weight: ${f.weight};`);
+    if (f.style !== "normal") L0.push(`font-style: ${f.style};`);
+    if (e.lh) L0.push(`line-height: ${L(e.lh)};`);
+    if (r.ls != null) L0.push(`letter-spacing: ${r.ls === 0 ? "0" : L(r.ls)};`);
+    L0.push(`color: ${cssColor(r.color, r.opacity)};`);
+    if (e.runs.length > 1) L0.push(`/* El texto tiene ${e.runs.length} tramos con estilos distintos; ver lista */`);
+    return L0.join("\n");
+  }
+  L0.push(`width: ${L(e.w)};`, `height: ${L(e.h)};`);
+  if (e.k === "group") return L0.join("\n");
+  if (e.k === "image") { L0.push(`/* imagen: ${e.px[0]}×${e.px[1]} px de origen */`); return L0.join("\n"); }
+  if (e.path === "path") L0.push(`/* forma libre: usar el SVG exportado */`);
+  if (e.fill) L0.push(`background-color: ${cssColor(e.fill, e.fo)};`);
+  if (e.stroke) L0.push(`border: ${L(e.sw)} ${e.dash ? "dashed" : "solid"} ${cssColor(e.stroke, e.so)};`);
+  if (e.path === "rrect" || e.path === "ellipse") L0.push(`border-radius: ${radiusTxt(e.rad)};`);
+  if (e.shadow) { const s = e.shadow; L0.push(`box-shadow: ${L(s.x)} ${L(s.y)} ${L(s.blur)} ${cssColor(s.color, s.alpha)}; /* estimada: sombra rasterizada en el PDF */`); }
+  return L0.join("\n");
+}
+function colorRow(label, hex, a) { return `<div class="row">${swatch(hex, a)}<div><div class="k note">${label}</div><div class="mono">${esc(fmtColor(hex, a))}</div></div><button class="copy" data-copy="${esc(fmtColor(hex, a).split(" · ")[0])}">Copiar</button></div>`; }
+function statesFor(e) { if (!e) return []; const B = box(e); return S.states.filter(s => s.page === S.n && (() => { const R = { x0: s.rect[0], y0: s.rect[1], x1: s.rect[0] + s.rect[2], y1: s.rect[1] + s.rect[3] }; return !(B.x1 < R.x0 || B.x0 > R.x1 || B.y1 < R.y0 || B.y0 > R.y1) && (contains(R, B) || contains(B, R)); })()); }
+function segHtml(id, opts, cur) { return `<span class="seg" data-seg="${id}">${opts.map(([v, t]) => `<button data-v="${v}" aria-pressed="${cur === v}">${t}</button>`).join("")}</span>`; }
+
+function renderInspector() {
+  const I = $("#insp");
+  if (S.view !== "boards") return;
+  if (S.grid) { I.innerHTML = `<div><h2>Vista de cuadrícula</h2><p class="note">Elige una mesa para inspeccionarla.</p></div>`; return; }
+  const p = S.page; if (!p) return;
+  const fmt = `<div class="row" style="justify-content:space-between">${segHtml("color", [["hex", "HEX"], ["rgb", "RGB"], ["hsl", "HSL"]], S.color)}${segHtml("unit", [["px", "px"], ["rem", "rem"]], S.unit)}</div>`;
+  if (S.region && S.region.rect) {
+    const r = S.region.rect;
+    I.innerHTML = `<div><span class="kind">Región</span><h2>Selección de región</h2></div>
+      <div class="sec"><div class="kv"><div><span class="k">Ancho</span><span class="v">${L(r[2])}</span></div><div><span class="k">Alto</span><span class="v">${L(r[3])}</span></div><div><span class="k">X</span><span class="v">${L(r[0])}</span></div><div><span class="k">Y</span><span class="v">${L(r[1])}</span></div></div></div>
+      <div class="sec"><h3>Exportar región</h3><p class="note">Incluye todos los elementos que quedan completamente dentro del recuadro, sin fondo.</p>${exportCtl("reg")}</div>`;
+    return;
+  }
+  const e = S.sel;
+  if (!e) {
+    const cols = new Map(), sty = new Map();
+    for (const x of p.els) {
+      if (x.fill) cols.set(x.fill, (cols.get(x.fill) || 0) + 1); if (x.stroke) cols.set(x.stroke, (cols.get(x.stroke) || 0) + 1);
+      if (x.k === "text") for (const r of x.runs) { if (r.color) cols.set(r.color, (cols.get(r.color) || 0) + 1); if (r.font.family) { const k = `${r.font.family}|${r.font.weight}|${r.font.style}|${r.size}|${r.color}`; sty.set(k, (sty.get(k) || 0) + 1); } }
+    }
+    const st = S.states.filter(s => s.page === S.n);
+    const imgs = p.els.filter(x => x.k === "image");
+    I.innerHTML = `<div><span class="kind">Mesa de trabajo ${S.n} de 37</span><h2>${esc(p.name)}</h2></div>
+      ${fmt}
+      <div class="sec"><div class="kv"><div><span class="k">Ancho</span><span class="v">${L(p.w)}</span></div><div><span class="k">Alto</span><span class="v">${L(p.h)}</span></div><div><span class="k">Elementos</span><span class="v">${p.els.length}</span></div><div><span class="k">Imágenes</span><span class="v">${imgs.length}</span></div></div>
+      <p class="note">Haz clic en un elemento para ver sus medidas. Con un elemento seleccionado, pasa el cursor sobre otro para ver la distancia. Clic otra vez en el mismo punto: selecciona el elemento de abajo. Ctrl + rueda: zoom.</p></div>
+      ${st.length ? `<div class="sec"><h3>Estados interactivos (${st.length})</h3><div class="tsl">${st.map((s, i) => `<button data-state="${S.states.indexOf(s)}"><span>${esc(s.component)}</span><small>${s.states.map(x => esc(x.name)).join(" · ")}</small></button>`).join("")}</div></div>` : ""}
+      <div class="sec"><h3>Colores en esta mesa (${cols.size})</h3><div class="chips">${[...cols].sort((a, b) => b[1] - a[1]).map(([h]) => `<button class="chip" data-copy="${h}" title="Copiar">${swatch(h)}${esc(fmtColor(h))}</button>`).join("")}</div></div>
+      <div class="sec"><h3>Estilos de caracteres (${sty.size})</h3><div class="tsl">${[...sty].sort((a, b) => b[1] - a[1]).slice(0, 40).map(([k]) => { const [fam, w, s, size, c] = k.split("|"); return `<button disabled><span style="font-family:${fontStack({ family: fam })};font-weight:${w};font-style:${s};font-size:${Math.min(+size, 22)}px">${esc(fam)} ${w}</span><small>${size}px · ${esc(fmtColor(c))}</small></button>`; }).join("")}</div></div>
+      <div class="sec"><h3>Descargar esta mesa</h3>${exportCtl("board")}
+        <button class="ib" data-act="boardzip">Recursos de esta mesa (ZIP)</button>
+        <p class="note">El ZIP incluye la mesa, sus imágenes${S.n === S.kit.iconPage ? ", los 766 íconos" : ""}${S.logos.some(l => l.page === S.n) ? " y los logos" : ""} en el formato elegido.</p></div>`;
+    return;
+  }
+  const st = statesFor(e);
+  if (S.itab === "states" && !st.length) S.itab = "props";
+  const tabs = `<div class="itabs">${[["props", "Propiedades"], ["css", "CSS"], ...(st.length ? [["states", `Estados (${st.reduce((a, s) => a + s.states.length, 0)})`]] : [])].map(([v, t]) => `<button data-itab="${v}" aria-pressed="${S.itab === v}">${t}</button>`).join("")}</div>`;
+  let body = "";
+  if (S.itab === "css") body = `<div class="sec"><div class="row" style="justify-content:space-between"><h3>CSS</h3><button class="copy" data-copy-css>Copiar CSS</button></div><pre class="css">${esc(cssFor(e))}</pre></div>`;
+  else if (S.itab === "states") body = st.map(s => stateBlock(s)).join("");
+  else body = propsHtml(e);
+  const nb = neighbours(e);
+  I.innerHTML = `<div><span class="kind">${kindOf(e)}</span><h2>${e.k === "text" ? esc(e.text.split("\n")[0].slice(0, 60)) : e.k === "group" ? esc(e.name) : kindOf(e)}</h2></div>${fmt}${tabs}${body}
+    ${S.itab === "props" ? `<div class="sec"><h3>Distancias a vecinos</h3><div class="kv"><div><span class="k">Arriba</span><span class="v">${L(nb.top[0])}</span></div><div><span class="k">Abajo</span><span class="v">${L(nb.bottom[0])}</span></div><div><span class="k">Izquierda</span><span class="v">${L(nb.left[0])}</span></div><div><span class="k">Derecha</span><span class="v">${L(nb.right[0])}</span></div></div>
+      <label class="row note"><input type="checkbox" id="nbChk" ${S.showNb ? "checked" : ""}> Mostrar en el lienzo</label></div>
+      <div class="sec"><h3>Exportar elemento</h3>${exportCtl("el")}</div>` : ""}`;
+  if (S.itab === "states") fillCrops();
+}
+function propsHtml(e) {
+  let h = `<div class="sec"><div class="kv"><div><span class="k">Ancho</span><span class="v">${L(e.w)}</span></div><div><span class="k">Alto</span><span class="v">${L(e.h)}</span></div><div><span class="k">X</span><span class="v">${L(e.x)}</span></div><div><span class="k">Y</span><span class="v">${L(e.y)}</span></div></div></div>`;
+  if (e.k === "text") {
+    const runs = e.runs;
+    h += `<div class="sec"><div class="row" style="justify-content:space-between"><h3>Contenido</h3><button class="copy" data-copy="${esc(e.text)}">Copiar texto</button></div><div style="white-space:pre-wrap;max-height:140px;overflow:auto">${esc(e.text)}</div></div>`;
+    runs.slice(0, 12).forEach((r, i) => {
+      const f = r.font;
+      h += `<div class="sec"><h3>Tipografía${runs.length > 1 ? ` · tramo ${i + 1} de ${runs.length}` : ""}</h3>
+        ${f.family ? `<div style="font-family:${fontStack(f)};font-weight:${f.weight};font-style:${f.style};font-size:${Math.min(r.size, 28)}px;line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(r.text.trim().slice(0, 40) || "Aa")}</div>` : `<span class="flag">Fuente Type3 sin nombre en el PDF: familia no identificable</span>`}
+        <div class="kv">
+          <div><span class="k">Familia</span><span class="v">${esc(f.family || "—")}</span></div>
+          <div><span class="k">Peso</span><span class="v">${f.weight ? `${f.weight} · ${esc((f.ps.split("-")[1] || "Regular"))}` : "—"}</span></div>
+          <div><span class="k">Tamaño</span><span class="v">${L(r.size)}</span></div>
+          <div><span class="k">Estilo</span><span class="v">${f.style === "italic" ? "Cursiva" : f.style ? "Normal" : "—"}</span></div>
+          <div><span class="k">Interlineado</span><span class="v">${e.lh ? L(e.lh) : "—"}</span></div>
+          <div><span class="k">Espaciado letras</span><span class="v">${r.ls == null ? "—" : `${L(r.ls)} · XD ${Math.round(r.ls / r.size * 1000)}`}</span></div>
+        </div>
+        ${!e.lh ? `<p class="note">Interlineado: el texto tiene una sola línea y el PDF no guarda ese valor.</p>` : ""}
+        ${colorRow("Color", r.color, r.opacity)}
+        <p class="note mono">PostScript: ${esc(f.ps)}</p></div>`;
+    });
+    if (runs.length > 12) h += `<p class="note">… y ${runs.length - 12} tramos más.</p>`;
+    return h;
+  }
+  if (e.k === "group") return h + `<div class="sec"><p class="note">Recuadro que agrupa la fila de la tabla «Estados». Abre la pestaña Estados para ver cada uno.</p></div>`;
+  if (e.k === "image") {
+    return h + `<div class="sec"><h3>Imagen</h3><img src="data/${e.src}" alt="" style="max-height:160px;object-fit:contain;background:var(--panel-2)"><p class="note">Mapa de bits incluido en el PDF: ${e.px[0]} × ${e.px[1]} px de origen, mostrado a ${px(e.w)} × ${px(e.h)}.</p></div>`;
+  }
+  if (e.fill) h += `<div class="sec"><h3>Relleno</h3>${colorRow("Color", e.fill, e.fo)}</div>`;
+  if (e.stroke) h += `<div class="sec"><h3>Borde</h3>${colorRow("Color", e.stroke, e.so)}<div class="kv"><div><span class="k">Grosor</span><span class="v">${L(e.sw)}</span></div><div><span class="k">Tipo</span><span class="v">${e.dash ? "Discontinuo" : "Sólido"}</span></div></div></div>`;
+  if (e.path === "rrect" || e.path === "ellipse" || e.path === "rect") h += `<div class="sec"><h3>Radio de esquinas</h3><div class="mono">${radiusTxt(e.rad)}</div></div>`;
+  if (e.path === "path") h += `<div class="sec"><p class="note">Trazado vectorial libre (ícono, logo o ilustración): descárgalo como SVG para usarlo tal cual.</p></div>`;
+  if (e.shadow) { const s = e.shadow; h += `<div class="sec"><h3>Sombra <span class="flag">estimada</span></h3>${colorRow("Color", s.color, s.alpha)}<div class="kv"><div><span class="k">X</span><span class="v">${L(s.x)}</span></div><div><span class="k">Y</span><span class="v">${L(s.y)}</span></div><div><span class="k">Desenfoque</span><span class="v">${L(s.blur)}</span></div></div><p class="note">El PDF guarda las sombras como imagen. Desplazamiento y desenfoque se calculan del tamaño de esa imagen; la opacidad es la máxima observada. Verifica contra el prototipo antes de fijar valores.</p></div>`; }
+  return h;
+}
+function stateBlock(s) {
+  const xd = s.xd;
+  const xdHtml = xd ? `<div class="state"><header><b>En el prototipo de XD</b><span>${esc(xd.trigger || "")}</span>${xd.confirmed === false ? `<span class="flag">observado, no confirmado</span>` : ""}</header>
+    ${(xd.imgs || []).map(i => `<img src="data/${i.src}" alt="${esc(i.label)}" title="${esc(i.label)}">`).join("")}
+    <div class="body"><p class="note" style="color:var(--fg)">${esc(xd.text)}</p>${(xd.values || []).map(v => `<div class="row">${v.hex ? swatch(v.hex) : ""}<span class="note">${esc(v.k)}</span><span class="mono" style="margin-left:auto">${esc(v.v)}</span></div>`).join("")}</div></div>` : "";
+  return `<div class="sec"><h3>${esc(s.component)}</h3>
+    <p class="note">${s.states.length ? "Valores exactos de la tabla «Estados» del PDF." : "Sin tabla de estados en el PDF."}</p>${xdHtml}
+    ${s.states.map(x => `<div class="state"><header><b>${esc(x.name)}</b><span>${esc(x.trigger || "")}</span></header>${x.crop ? `<div class="crop" data-crop="${x.crop.join(",")}" style="aspect-ratio:${x.crop[2]}/${x.crop[3]};max-height:96px;margin-inline:auto;width:100%;background:#fff;border-block:1px solid var(--line)"></div>` : ""}<div class="body">${(x.values || []).map(v => `<div class="row">${v.hex ? swatch(v.hex, v.a ?? 1) : ""}<span class="note">${esc(v.k)}</span><span class="mono" style="margin-left:auto">${esc(v.v)}</span></div>`).join("")}${x.css ? `<pre class="css">${esc(x.css)}</pre><button class="copy" data-copy="${esc(x.css)}">Copiar CSS</button>` : ""}</div></div>`).join("")}</div>`;
+}
+async function fillCrops() {
+  for (const el of document.querySelectorAll("#insp [data-crop]")) {
+    const r = el.dataset.crop.split(",").map(Number);
+    const R = { x0: r[0], y0: r[1], x1: r[0] + r[2], y1: r[1] + r[3] };
+    const under = S.page.els.filter(e => e.k === "shape" && e.fill && (e.fo ?? 1) >= 1 && contains(box(e), R)).sort((a, b) => a.area - b.area)[0];
+    const t = await regionSVG(S.n, r, under ? under.fill : "#FFFFFF");
+    if (t && el.isConnected) el.innerHTML = `<img alt="" style="display:block;width:100%;height:100%;object-fit:contain" src="${URL.createObjectURL(new Blob([t], { type: "image/svg+xml" }))}">`;
+  }
+}
+function exportCtl(id) {
+  const opts = id.startsWith("img:") ? [["png1", "PNG (resolución original)"], ["svg", "SVG (con la imagen incrustada)"], ["pdf", "PDF"]]
+    : [["svg", "SVG"], ["png1", "PNG 1×"], ["png2", "PNG 2×"], ["png3", "PNG 3×"], ["pdf", "PDF"]];
+  const cur = id.startsWith("img:") ? "png1" : (pref("fmt") || "svg");
+  return `<div class="exp"><select id="fmt-${id}" aria-label="Formato">${opts.map(([v, t]) => `<option value="${v}" ${v === cur ? "selected" : ""}>${t}</option>`).join("")}</select><button class="ib primary" data-export="${id}">Descargar</button></div>`;
+}
+
+/* ---------------------------------------------------------------- exportación de vectores */
+function leafIndex(svg) {
+  const leaves = [];
+  const root = svg.getScreenCTM().inverse();
+  svg.querySelectorAll("path, use, image, rect, circle, ellipse, line, polygon, polyline").forEach(el => {
+    if (el.closest("defs, clipPath, mask, symbol, pattern")) return;
+    let bb; try { bb = el.getBBox(); } catch (e) { return; }
+    const m = root.multiply(el.getScreenCTM());
+    const pts = [[bb.x, bb.y], [bb.x + bb.width, bb.y], [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]].map(([x, y]) => [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]);
+    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    el.setAttribute("data-li", leaves.length);
+    leaves.push([Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]);
+  });
+  return leaves;
+}
+function subsetSVG(svg, leaves, rect, bg) {
+  const [x, y, w, h] = rect, t = .75;
+  const keep = new Set();
+  leaves.forEach((b, i) => { if (b[0] >= x - t && b[1] >= y - t && b[2] <= x + w + t && b[3] <= y + h + t) keep.add(String(i)); });
+  if (!keep.size) return null;
+  const c = svg.cloneNode(true);
+  c.querySelectorAll("[data-li]").forEach(el => { if (!keep.has(el.getAttribute("data-li"))) el.remove(); else el.removeAttribute("data-li"); });
+  let changed = true;
+  while (changed) { changed = false; c.querySelectorAll("g").forEach(g => { if (!g.closest("defs, clipPath, mask") && !g.firstElementChild) { g.remove(); changed = true; } }); }
+  // conservar solo las definiciones referenciadas (glifos, recortes, máscaras)
+  const defs = new Map(); c.querySelectorAll("defs > [id]").forEach(d => defs.set(d.id, d));
+  const used = new Set(), queue = [];
+  const scan = el => { for (const a of el.attributes) { const v = a.value; let m; if (/href$/.test(a.name) && v[0] === "#") queue.push(v.slice(1)); const re = /url\(#([^)]+)\)/g; while ((m = re.exec(v))) queue.push(m[1]); } };
+  c.querySelectorAll("*").forEach(el => { if (!el.closest("defs")) scan(el); });
+  while (queue.length) { const id = queue.pop(); if (used.has(id)) continue; used.add(id); const d = defs.get(id); if (d) { scan(d); d.querySelectorAll("*").forEach(scan); } }
+  defs.forEach((d, id) => { if (!used.has(id)) d.remove(); });
+  c.setAttribute("viewBox", `${x} ${y} ${w} ${h}`); c.setAttribute("width", w); c.setAttribute("height", h);
+  c.removeAttribute("preserveAspectRatio"); c.removeAttribute("style");
+  if (bg) { const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("x", x); r.setAttribute("y", y); r.setAttribute("width", w); r.setAttribute("height", h); r.setAttribute("fill", bg); c.insertBefore(r, c.querySelector("defs")?.nextSibling || c.firstChild); }
+  return new XMLSerializer().serializeToString(c);
+}
+async function pageSVGEl(n) {
+  if (n === S.n && $("#art > svg")) { const svg = $("#art > svg"); if (!S.page.leaves) S.page.leaves = leafIndex(svg); return { svg, leaves: S.page.leaves }; }
+  let txt = await getSVG(n);
+  txt = txt.replace(/\bid="([^"]+)"/g, 'id="x$1"').replace(/href="#([^"]+)"/g, 'href="#x$1"').replace(/url\(#([^)]+)\)/g, "url(#x$1)");
+  const host = $("#host"); host.innerHTML = txt;
+  const svg = host.firstElementChild;
+  return { svg, leaves: leafIndex(svg) };
+}
+async function regionSVG(n, rect, bg) { const { svg, leaves } = await pageSVGEl(n); return subsetSVG(svg, leaves, rect, bg); }
+function rectOf(e) {
+  let r = [e.x, e.y, e.w, e.h];
+  if (e.stroke) { const s = e.sw / 2; r = [r[0] - s, r[1] - s, r[2] + 2 * s, r[3] + 2 * s]; }
+  if (e.shadow) { const b = e.shadow.box; const x0 = Math.min(r[0], b[0]), y0 = Math.min(r[1], b[1]); r = [x0, y0, Math.max(r[0] + r[2], b[0] + b[2]) - x0, Math.max(r[1] + r[3], b[1] + b[3]) - y0]; }
+  return r.map(v => Math.round(v * 100) / 100);
+}
+async function svgToPng(svgText, w, h, scale) {
+  const W = Math.round(w * scale), H = Math.round(h * scale);
+  if (W * H > 140e6 || W > 32000 || H > 32000) throw new Error(`La imagen a ${scale}× (${W}×${H} px) supera el máximo que el navegador puede generar. Usa SVG o PDF.`);
+  const url = URL.createObjectURL(new Blob([svgText], { type: "image/svg+xml" }));
+  try {
+    const img = new Image(); img.decoding = "async";
+    await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error("No se pudo rasterizar el SVG")); img.src = url; });
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    cv.getContext("2d").drawImage(img, 0, 0, W, H);
+    return await new Promise(res => cv.toBlob(res, "image/png"));
+  } finally { URL.revokeObjectURL(url); }
+}
+async function svgToPdf(svgText, w, h) {
+  const [{ jsPDF }] = await Promise.all([lib("jspdf"), lib("svg2pdf")]);
+  const doc = new jsPDF({ unit: "pt", format: [w, h], orientation: w > h ? "landscape" : "portrait", compress: true });
+  const host = $("#host"); host.innerHTML = svgText; const el = host.firstElementChild;
+  await doc.svg(el, { x: 0, y: 0, width: w, height: h });
+  host.innerHTML = "";
+  return doc.output("blob");
+}
+let kitPdfBytes;
+async function boardPdf(n) {
+  const PDFLib = await lib("pdflib");
+  kitPdfBytes ??= fetch("data/kit-ui-govco-v9.2.pdf").then(r => r.arrayBuffer());
+  const src = await PDFLib.PDFDocument.load(await kitPdfBytes);
+  const out = await PDFLib.PDFDocument.create();
+  const [pg] = await out.copyPages(src, [n - 1]); out.addPage(pg);
+  return new Blob([await out.save()], { type: "application/pdf" });
+}
+/* fmt: svg | png1 | png2 | png3 | pdf  → {name, blob} */
+async function render(fmt, base, svgText, w, h) {
+  if (fmt === "svg") return { name: base + ".svg", data: new Blob([svgText], { type: "image/svg+xml" }) };
+  if (fmt === "pdf") return { name: base + ".pdf", data: await svgToPdf(svgText, w, h) };
+  const s = +fmt.slice(3); return { name: `${base}${s > 1 ? "@" + s + "x" : ""}.png`, data: await svgToPng(svgText, w, h, s) };
+}
+const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const boardBase = n => `${pad(n)}-${slug(S.kit.artboards[n - 1].name)}`;
+async function boardFile(n, fmt) {
+  const a = S.kit.artboards[n - 1];
+  if (fmt === "pdf") return { name: boardBase(n) + ".pdf", data: await boardPdf(n) };
+  return render(fmt, boardBase(n), await getSVG(n), a.w, a.h);
+}
+function iconSvg(ic) { return ic.svg; }
+async function iconFile(ic, fmt) { return render(fmt, ic.id, ic.svg, ic.w, ic.h); }
+async function logoFile(lg, fmt) { const t = await regionSVG(lg.page, lg.rect); return render(fmt, lg.id, t, lg.rect[2], lg.rect[3]); }
+async function imageFile(src, fmt, w, h, name) {
+  const blob = await fetch("data/" + src).then(r => r.blob());
+  if (fmt === "png1" || fmt === "png2" || fmt === "png3") return { name: name + ".png", data: blob };
+  const b64 = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(blob); });
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><image width="${w}" height="${h}" preserveAspectRatio="none" xlink:href="${b64}"/></svg>`;
+  return render(fmt, name, svg, w, h);
+}
+async function withBusy(btn, fn) {
+  const old = btn && btn.textContent; if (btn) { btn.disabled = true; btn.textContent = "Preparando…"; }
+  try { await fn(); } catch (err) { console.error(err); toast(err.message || "No se pudo exportar"); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = old; } }
+}
+async function zipOf(files, name) {
+  const JSZip = await lib("zip"); const z = new JSZip();
+  for (const f of files) z.file(f.name, f.data);
+  return { name, data: await z.generateAsync({ type: "blob", compression: "DEFLATE" }) };
+}
+async function loadIcons() { if (!S.icons) S.icons = await getJSON("data/icons.json"); return S.icons; }
+async function pageAssets(n, fmt, prefix = "") {
+  const files = [await boardFile(n, fmt)].map(f => ({ ...f, name: prefix + f.name }));
+  const js = await getJSON(`data/p${pad(n)}.json`); const seen = new Set();
+  for (const e of js.els) if (e.k === "image" && !seen.has(e.src)) { seen.add(e.src); const f = await imageFile(e.src, fmt === "pdf" || fmt === "svg" ? fmt : "png1", e.w, e.h, "imagen-" + e.src.slice(4, 12)); files.push({ ...f, name: prefix + "imagenes/" + f.name }); }
+  for (const lg of S.logos.filter(l => l.page === n)) { const f = await logoFile(lg, fmt); files.push({ ...f, name: prefix + "logos/" + f.name }); }
+  if (n === S.kit.iconPage) for (const ic of await loadIcons()) { const f = await iconFile(ic, fmt); files.push({ ...f, name: prefix + "iconos/" + f.name }); }
+  return files;
+}
+
+async function doExport(id, btn) {
+  const fmt = $("#fmt-" + id).value; pref("fmt", fmt);
+  await withBusy(btn, async () => {
+    let f;
+    if (id === "board") f = await boardFile(S.n, fmt);
+    else if (id === "reg") { const r = S.region.rect.map(v => Math.round(v * 100) / 100); const t = await regionSVG(S.n, r); if (!t) throw new Error("No hay elementos completos dentro de la región"); f = await render(fmt, `${boardBase(S.n)}-region-${Math.round(r[0])}-${Math.round(r[1])}`, t, r[2], r[3]); }
+    else if (id === "el") {
+      const e = S.sel;
+      if (e.k === "image") f = await imageFile(e.src, fmt, e.w, e.h, `${boardBase(S.n)}-imagen-${e.id}`);
+      else { const r = rectOf(e); const t = await regionSVG(S.n, r); if (!t) throw new Error("No se encontró el vector del elemento"); f = await render(fmt, `${boardBase(S.n)}-${e.k === "text" ? "texto" : e.k === "group" ? "componente" : "forma"}-${e.id}`, t, r[2], r[3]); }
+    }
+    else if (id === "icon") { const ic = S.icons.find(i => i.id === S.iconOpen); f = await iconFile(ic, fmt); }
+    else if (id.startsWith("logo:")) { f = await logoFile(S.logos.find(l => l.id === id.slice(5)), fmt); }
+    else if (id.startsWith("img:")) { const [, src, w, h] = id.split(":"); f = await imageFile(src, fmt, +w, +h, "imagen-" + src.slice(4, 12)); }
+    await save(f.name, f.data);
+  });
+}
+
+/* ---------------------------------------------------------------- recursos */
+function resNav() {
+  const k = S.kit, imgsN = S.allImages ? S.allImages.length : "…";
+  const items = [["colors", "Colores", k.colors.length], ["styles", "Estilos de caracteres", k.textStyles.length], ["icons", "Iconografía", k.icons.length], ["logos", "Logos", S.logos.length], ["images", "Imágenes", imgsN], ["tokens", "Exportar variables", ""]];
+  return items.map(([v, t, c]) => `<button data-res="${v}" aria-pressed="${S.resTab === v}">${t}<i>${c}</i></button>`).join("");
+}
+async function renderRes() {
+  const M = $("#main");
+  M.innerHTML = `<nav class="rnav" id="rnav">${resNav()}</nav><section class="rbody" id="rbody"></section>`;
+  const B = $("#rbody"), k = S.kit;
+  const fmtBar = `${segHtml("color", [["hex", "HEX"], ["rgb", "RGB"], ["hsl", "HSL"]], S.color)}`;
+  if (S.resTab === "colors") {
+    B.innerHTML = `<h2>Colores del documento</h2><div class="bar">${fmtBar}<span class="note">Todos los colores de relleno, borde y texto del PDF, ordenados por uso. Clic para copiar.</span></div>
+      <div class="colors">${k.colors.map(c => `<button class="color" data-copy="${esc(fmtColor(c.hex))}"><span class="fill" style="background:${c.hex}"></span><span class="meta"><b>${esc(fmtColor(c.hex))}</b><span>${c.count} usos · mesas ${c.pages.length > 6 ? c.pages.slice(0, 6).join(", ") + "…" : c.pages.join(", ")}</span></span></button>`).join("")}</div>`;
+  } else if (S.resTab === "styles") {
+    B.innerHTML = `<h2>Estilos de caracteres</h2><div class="bar"><input type="search" id="sq" placeholder="Filtrar: familia, tamaño o color" value="${esc(S.sq || "")}" aria-label="Filtrar estilos"><span class="note">Valores leídos del PDF. Verdana es fuente del sistema (Windows/macOS); Nunito Sans y Montserrat se cargan desde Google Fonts para las muestras.</span></div><div class="styles" id="stl"></div>`;
+    const draw2 = () => {
+      const q = ($("#sq").value || "").toLowerCase(); S.sq = q;
+      $("#stl").innerHTML = k.textStyles.filter(s => !q || `${s.family} ${s.weight} ${s.size} ${s.color} ${s.ps}`.toLowerCase().includes(q)).map(s => `<div class="style"><div class="smp" style="font-family:${fontStack(s)};font-weight:${s.weight};font-style:${s.style};font-size:${Math.min(s.size, 48)}px;line-height:1.25;color:${s.color === "#FFFFFF" ? "inherit" : s.color}">${esc(s.sample.trim() || s.family)}</div><button class="copy" data-copy="${esc(styleCss(s))}">Copiar CSS</button><small>${esc(s.family)} · ${s.weight}${s.style === "italic" ? " cursiva" : ""} · ${s.size}px · interlineado ${s.lh.length ? s.lh.map(v => v + "px").join(" / ") : "—"} · espaciado ${s.ls == null ? "—" : s.ls + "px"} · ${esc(fmtColor(s.color))} · ${s.count} usos · mesas ${s.pages.join(", ")}</small></div>`).join("");
+    };
+    draw2(); $("#sq").addEventListener("input", draw2);
+  } else if (S.resTab === "icons") {
+    const icons = await loadIcons();
+    B.innerHTML = `<h2>Iconografía <span class="note">(${icons.length} íconos de la mesa 10)</span></h2>
+      <div class="bar"><input type="search" id="iq" placeholder="Buscar por número (ej. 128) o color (ej. #000000)" value="${esc(S.iq || "")}" aria-label="Buscar ícono">
+        <label class="row note"><input type="checkbox" id="idark" ${S.idark ? "checked" : ""}> Fondo oscuro</label>
+        <select id="fmt-icons" aria-label="Formato">${[["svg", "SVG"], ["png1", "PNG 1×"], ["png2", "PNG 2×"], ["png3", "PNG 3×"], ["pdf", "PDF"]].map(([v, t]) => `<option value="${v}" ${v === (pref("fmt") || "svg") ? "selected" : ""}>${t}</option>`).join("")}</select>
+        <button class="ib" id="iselAll">Seleccionar visibles</button>
+        <button class="ib primary" id="idl" ${S.iconSel.size ? "" : "disabled"}>Descargar seleccionados (${S.iconSel.size})</button>
+        <button class="ib" id="idlAll">Todos (ZIP)</button></div>
+      <p class="note">El kit no asigna nombres a los íconos: se numeran por posición en la galería (fila por fila, de izquierda a derecha). Cada ícono se comparó píxel a píxel con el PDF.</p>
+      <div id="idrawer"></div><div class="icons ${S.idark ? "dark-ic" : ""}" id="igrid"></div>`;
+    const draw3 = () => {
+      const q = ($("#iq").value || "").trim().toLowerCase(); S.iq = q;
+      const list = icons.filter(i => !q || String(i.n) === q.replace(/^0+/, "") || i.id.includes(q) || i.colors.some(c => c.toLowerCase().includes(q)));
+      S.iconVisible = list;
+      $("#igrid").innerHTML = list.map(i => `<div class="ic" role="button" tabindex="0" data-icon="${i.id}" aria-pressed="${S.iconOpen === i.id}" title="${i.id} · ${px(i.w)}×${px(i.h)}"><input type="checkbox" data-isel="${i.id}" ${S.iconSel.has(i.id) ? "checked" : ""} aria-label="Seleccionar ${i.id}"><span class="g">${i.svg}</span><span>${String(i.n).padStart(3, "0")}</span></div>`).join("") || `<p class="note">Ningún ícono coincide.</p>`;
+    };
+    draw3(); drawIconDrawer();
+    $("#iq").addEventListener("input", draw3);
+    $("#idark").addEventListener("change", ev => { S.idark = ev.target.checked; $("#igrid").classList.toggle("dark-ic", S.idark); });
+  } else if (S.resTab === "logos") {
+    B.innerHTML = `<h2>Logos</h2><p class="note">Logos vectoriales tal como aparecen en el kit. Se exportan desde el vector del PDF, sin fondo.</p><div class="assets">${S.logos.map(l => `<div class="asset"><div class="pv" data-logo-pv="${l.id}" ${l.bg ? `style="background:${l.bg}"` : ""}>…</div><b>${esc(l.name)}</b><span class="note mono">${px(l.rect[2])} × ${px(l.rect[3])} · mesa ${l.page}</span>${exportCtl("logo:" + l.id)}</div>`).join("")}
+      <div class="asset"><div class="pv"><img src="data/img/${S.coImg || ""}" alt=""></div><b>Logo CO Colombia</b><span class="note">En el PDF es una imagen de mapa de bits (no vectorial); se entrega tal cual.</span>${S.coImg ? exportCtl(`img:img/${S.coImg}:219:169`) : ""}</div></div>`;
+    for (const l of S.logos) {
+      const t = await regionSVG(l.page, l.rect); const el = $(`[data-logo-pv="${l.id}"]`);
+      if (el && t) el.innerHTML = `<img alt="${esc(l.name)}" src="${URL.createObjectURL(new Blob([t], { type: "image/svg+xml" }))}">`;
+    }
+  } else if (S.resTab === "images") {
+    const imgs = await allImages();
+    B.innerHTML = `<h2>Imágenes</h2><p class="note">Mapas de bits incluidos en el PDF (fotografías y logos raster), sin duplicados. Se descargan en su resolución original.</p><div class="assets">${imgs.map(m => `<div class="asset"><div class="pv"><img loading="lazy" src="data/${m.src}" alt=""></div><span class="note mono">${m.px[0]} × ${m.px[1]} px · mesas ${m.pages.join(", ")}</span>${exportCtl(`img:${m.src}:${m.w}:${m.h}`)}</div>`).join("")}</div>`;
+  } else if (S.resTab === "tokens") {
+    const css = tokensCss(), json = JSON.stringify(tokensJson(), null, 2);
+    B.innerHTML = `<h2>Exportar variables</h2><p class="note">Paleta y estilos de texto del PDF como variables CSS y JSON. Los nombres se generan a partir de los valores (el kit no nombra sus colores ni estilos); los valores no se modifican.</p>
+      <div class="bar"><button class="ib primary" id="tkZip">Descargar CSS + JSON (ZIP)</button><button class="ib" id="tkJson">Descargar JSON</button><button class="ib" data-copy-id="tcss">Copiar CSS</button><button class="ib" data-copy-id="tjson">Copiar JSON</button></div>
+      <h3 class="note">variables.css</h3><textarea class="out" id="tcss" readonly>${esc(css)}</textarea>
+      <h3 class="note">tokens.json</h3><textarea class="out" id="tjson" readonly>${esc(json)}</textarea>`;
+  }
+}
+function drawIconDrawer() {
+  const D = $("#idrawer"); if (!D) return;
+  const ic = S.icons && S.icons.find(i => i.id === S.iconOpen);
+  if (!ic) { D.innerHTML = ""; return; }
+  D.innerHTML = `<div class="drawer"><div class="pv">${ic.svg.replace("<svg ", '<svg preserveAspectRatio="xMidYMid meet" ')}</div><div style="display:grid;gap:8px;align-content:start;min-width:0"><b>${ic.id}</b>
+    <div class="kv"><div><span class="k">Ancho</span><span class="v">${px(ic.w)}px</span></div><div><span class="k">Alto</span><span class="v">${px(ic.h)}px</span></div><div><span class="k">Posición en la mesa 10</span><span class="v">${px(ic.x)}, ${px(ic.y)}</span></div><div><span class="k">Piezas</span><span class="v">${ic.parts}</span></div></div>
+    <div class="chips">${ic.colors.map(c => `<span class="chip">${swatch(c)}${c}</span>`).join("")}</div>
+    ${exportCtl("icon")}<div class="row"><button class="copy" data-copy="${esc(ic.svg)}">Copiar SVG</button><button class="copy" data-goto-icon="${ic.id}">Ver en la mesa</button></div></div></div>`;
+}
+function styleName(s) { return `${slug(s.family)}-${s.weight}${s.style === "italic" ? "i" : ""}-${String(s.size).replace(".", "_")}-${s.color.slice(1).toLowerCase()}`; }
+function styleCss(s) { return [`font-family: ${fontStack(s)};`, `font-size: ${s.size}px;`, `font-weight: ${s.weight};`, s.style === "italic" ? "font-style: italic;" : "", s.lh.length === 1 ? `line-height: ${s.lh[0]}px;` : "", s.ls != null ? `letter-spacing: ${s.ls}px;` : "", `color: ${s.color.toLowerCase()};`].filter(Boolean).join("\n"); }
+function tokensJson() {
+  const k = S.kit;
+  return {
+    $source: "Kit UI GOV.CO versión 9.2 (agosto 2025), PDF oficial MinTIC — extracción no oficial",
+    color: Object.fromEntries(k.colors.map(c => [`color-${c.hex.slice(1).toLowerCase()}`, { value: c.hex, rgb: hexToRgb(c.hex), usos: c.count, mesas: c.pages }])),
+    textStyle: Object.fromEntries(k.textStyles.map(s => [styleName(s), { fontFamily: s.family, fontPostScript: s.ps, fontWeight: s.weight, fontStyle: s.style, fontSize: s.size + "px", lineHeight: s.lh.map(v => v + "px"), letterSpacing: s.ls == null ? null : s.ls + "px", color: s.color, usos: s.count, mesas: s.pages }])),
+  };
+}
+function tokensCss() {
+  const k = S.kit, out = ["/* Kit UI GOV.CO 9.2 — variables extraídas del PDF oficial (herramienta no oficial). */", ":root {"];
+  for (const c of k.colors) out.push(`  --color-${c.hex.slice(1).toLowerCase()}: ${c.hex}; /* ${c.count} usos */`);
+  const fams = [...new Set(k.textStyles.map(s => s.family))];
+  for (const f of fams) out.push(`  --font-${slug(f)}: ${fontStack({ family: f })};`);
+  out.push("}", "", "/* Estilos de caracteres: familia-peso-tamaño-color. Interlineado solo cuando el PDF lo muestra en textos de varias líneas. */");
+  for (const s of k.textStyles) out.push(`.ts-${styleName(s)} {\n  ${styleCss(s).replace(fontStack(s), `var(--font-${slug(s.family)})`).replace(/\n/g, "\n  ")}\n}`);
+  return out.join("\n");
+}
+async function allImages() {
+  if (S.allImages) return S.allImages;
+  const m = new Map();
+  for (let n = 1; n <= 37; n++) { const js = await getJSON(`data/p${pad(n)}.json`); for (const e of js.els) if (e.k === "image") { const x = m.get(e.src) || { src: e.src, px: e.px, w: e.w, h: e.h, pages: [] }; if (!x.pages.includes(n)) x.pages.push(n); m.set(e.src, x); } }
+  S.allImages = [...m.values()]; return S.allImages;
+}
+
+/* ---------------------------------------------------------------- vistas */
+function setView(v) {
+  S.view = v;
+  $("#tabBoards").setAttribute("aria-pressed", v === "boards"); $("#tabRes").setAttribute("aria-pressed", v === "res");
+  $("#navBox").hidden = v !== "boards"; $("#zoomBox").hidden = v !== "boards";
+  const M = $("#main");
+  if (v === "res") { M.classList.add("res"); S._boards ??= { side: $("#side"), stage: $("#stage"), insp: $("#insp") }; renderRes(); try { history.replaceState(null, "", "#recursos"); } catch (e) { } }
+  else { M.classList.remove("res"); M.innerHTML = ""; M.append(S._boards.side, S._boards.stage, S._boards.insp); openBoard(S.n, true); }
+}
+
+/* ---------------------------------------------------------------- eventos */
+function wire() {
+  $("#tabBoards").onclick = () => S.view !== "boards" && setView("boards");
+  $("#tabRes").onclick = () => S.view !== "res" && setView("res");
+  $("#prev").onclick = () => openBoard(S.n - 1); $("#next").onclick = () => openBoard(S.n + 1);
+  $("#zin").onclick = () => setZoom(S.z * 1.25); $("#zout").onclick = () => setZoom(S.z / 1.25);
+  $("#zfit").onclick = () => { S.z = fitZ(); applyZoom(); }; $("#z100").onclick = () => setZoom(1);
+  $("#q").oninput = renderList;
+  $("#gridBtn").onclick = () => { S.grid = !S.grid; $("#gridBtn").setAttribute("aria-pressed", S.grid); if (S.grid) { renderList(); renderGrid(); } else openBoard(S.n, true); };
+  $("#regionBtn").onclick = () => toggleRegion();
+  $("#dlAll").onclick = ev => downloadAll(ev.currentTarget);
+  const st = $("#stage");
+  st.addEventListener("wheel", ev => { if (!ev.ctrlKey && !ev.metaKey) return; ev.preventDefault(); setZoom(S.z * (ev.deltaY < 0 ? 1.12 : 1 / 1.12), ev.clientX, ev.clientY); }, { passive: false });
+  let drag = null;
+  st.addEventListener("pointerdown", ev => {
+    if (!S.page || S.grid || !ev.target.closest("#board")) return;
+    if (S.region) { const [x, y] = toPage(ev); drag = [x, y]; S.region.rect = null; st.setPointerCapture(ev.pointerId); }
+  });
+  st.addEventListener("pointermove", ev => {
+    if (!S.page || S.grid) return;
+    if (S.region && drag) { const [x, y] = toPage(ev); S.region.rect = [Math.min(x, drag[0]), Math.min(y, drag[1]), Math.abs(x - drag[0]), Math.abs(y - drag[1])].map(v => Math.round(v)); draw(); return; }
+    if (S.region || !ev.target.closest("#board")) return;
+    const [x, y] = toPage(ev); const h = hits(x, y)[0] || null;
+    if (h !== S.hover) { S.hover = h; draw(); }
+  });
+  st.addEventListener("pointerleave", () => { if (S.hover) { S.hover = null; draw(); } });
+  st.addEventListener("pointerup", ev => { if (S.region && drag) { drag = null; if (S.region.rect && S.region.rect[2] > 2) renderInspector(); } });
+  st.addEventListener("click", ev => {
+    if (S.grid) { const b = ev.target.closest("[data-n]"); if (b) openBoard(+b.dataset.n); return; }
+    if (S.region || !S.page) return;
+    if (!ev.target.closest("#board")) { S.sel = null; draw(); renderInspector(); return; }
+    const [x, y] = toPage(ev); const hs = hits(x, y);
+    if (!hs.length) { S.sel = null; } else {
+      const same = S.cycle && Math.abs(S.cycle[0] - x) < 3 / S.z && Math.abs(S.cycle[1] - y) < 3 / S.z;
+      const i = same ? (hs.indexOf(S.sel) + 1) % hs.length : 0;
+      S.sel = hs[i]; S.cycle = [x, y];
+    }
+    S.hover = null; draw(); renderInspector();
+  });
+  document.addEventListener("click", ev => {
+    const t = ev.target;
+    const ab = t.closest(".ab[data-n]"); if (ab) { openBoard(+ab.dataset.n); return; }
+    const cp = t.closest("[data-copy]"); if (cp) { copyText(cp.dataset.copy, cp); return; }
+    if (t.closest("[data-copy-css]")) { copyText(cssFor(S.sel)); return; }
+    const ci = t.closest("[data-copy-id]"); if (ci) { copyText($("#" + ci.dataset.copyId).value); return; }
+    const sg = t.closest(".seg button"); if (sg) { const k = sg.parentElement.dataset.seg; S[k] = sg.dataset.v; pref(k, S[k]); S.view === "res" ? renderRes() : renderInspector(); return; }
+    const it = t.closest("[data-itab]"); if (it) { S.itab = it.dataset.itab; renderInspector(); return; }
+    const ex = t.closest("[data-export]"); if (ex) { doExport(ex.dataset.export, ex); return; }
+    if (t.closest("[data-act=boardzip]")) { const b = t.closest("[data-act]"); const fmt = $("#fmt-board").value; withBusy(b, async () => { const files = await pageAssets(S.n, fmt); const z = await zipOf(files, `${boardBase(S.n)}-recursos.zip`); await save(z.name, z.data); }); return; }
+    const sb = t.closest("[data-state]"); if (sb) { const s = S.states[+sb.dataset.state]; const [x, y, w, h] = s.rect; const e = { k: "group", id: "g" + sb.dataset.state, name: s.component, x, y, w, h, area: w * h }; S.sel = e; S.itab = "states"; draw(); renderInspector(); scrollToEl(e); return; }
+    const rs = t.closest("[data-res]"); if (rs) { S.resTab = rs.dataset.res; renderRes(); return; }
+    if (t.matches("[data-isel]")) { const id = t.dataset.isel; t.checked ? S.iconSel.add(id) : S.iconSel.delete(id); updIconBtn(); return; }
+    const ic = t.closest("[data-icon]"); if (ic) { S.iconOpen = ic.dataset.icon; document.querySelectorAll(".ic[aria-pressed=true]").forEach(x => x.setAttribute("aria-pressed", "false")); ic.setAttribute("aria-pressed", "true"); drawIconDrawer(); $("#idrawer").scrollIntoView({ block: "nearest" }); return; }
+    if (t.id === "iselAll") { (S.iconVisible || []).forEach(i => S.iconSel.add(i.id)); document.querySelectorAll("[data-isel]").forEach(c => c.checked = S.iconSel.has(c.dataset.isel)); updIconBtn(); return; }
+    if (t.id === "idl" || t.id === "idlAll") {
+      const fmt = $("#fmt-icons").value; pref("fmt", fmt);
+      const list = t.id === "idl" ? S.icons.filter(i => S.iconSel.has(i.id)) : S.icons;
+      withBusy(t, async () => {
+        const files = []; let k = 0;
+        for (const i of list) { files.push(await iconFile(i, fmt)); if (++k % 25 === 0) t.textContent = `${k}/${list.length}…`; }
+        const z = await zipOf(files, `kit-ui-govco-iconos-${list.length}-${fmt}.zip`); await save(z.name, z.data);
+      });
+      return;
+    }
+    const gi = t.closest("[data-goto-icon]"); if (gi) { const ic2 = S.icons.find(i => i.id === gi.dataset.gotoIcon); S.n = S.kit.iconPage; setView("boards"); setTimeout(async () => { await openBoard(S.kit.iconPage); const e = S.page.els.filter(x => x.x >= ic2.x - .5 && x.y >= ic2.y - .5 && x.x + x.w <= ic2.x + ic2.w + .5 && x.y + x.h <= ic2.y + ic2.h + .5).sort((a, b) => b.area - a.area)[0]; if (e) { S.sel = e; draw(); renderInspector(); scrollToEl(e); } }, 0); return; }
+    if (t.id === "tkZip") { withBusy(t, async () => { const z = await zipOf([{ name: "variables.css", data: tokensCss() }, { name: "tokens.json", data: JSON.stringify(tokensJson(), null, 2) }], "kit-ui-govco-9.2-variables.zip"); await save(z.name, z.data); }); return; }
+    if (t.id === "tkJson") { save("kit-ui-govco-9.2-tokens.json", JSON.stringify(tokensJson(), null, 2)); return; }
+  });
+  document.addEventListener("change", ev => { if (ev.target.id === "nbChk") { S.showNb = ev.target.checked; pref("nb", S.showNb ? "1" : "0"); draw(); } });
+  document.addEventListener("keydown", ev => {
+    if (ev.target.matches("input, textarea, select")) return;
+    if (S.view !== "boards") return;
+    if (ev.key === "ArrowRight") openBoard(S.n + 1);
+    else if (ev.key === "ArrowLeft") openBoard(S.n - 1);
+    else if (ev.key === "Escape") { S.sel = null; if (S.region) toggleRegion(); draw(); renderInspector(); }
+    else if (ev.key === "r" || ev.key === "R") toggleRegion();
+    else if (ev.key === "+" || ev.key === "=") setZoom(S.z * 1.25);
+    else if (ev.key === "-") setZoom(S.z / 1.25);
+    else if (ev.key === "0") { S.z = fitZ(); applyZoom(); }
+  });
+  window.addEventListener("resize", () => { if (S.view === "boards") draw(); });
+}
+function updIconBtn() { const b = $("#idl"); if (b) { b.disabled = !S.iconSel.size; b.textContent = `Descargar seleccionados (${S.iconSel.size})`; } }
+function toggleRegion() { S.region = S.region ? null : { rect: null }; $("#regionBtn").setAttribute("aria-pressed", !!S.region); $("#stage").classList.toggle("region", !!S.region); S.sel = null; draw(); renderInspector(); }
+function scrollToEl(e) { const st = $("#stage"), b = $("#board"); st.scrollTo({ top: b.offsetTop + e.y * S.z - st.clientHeight / 3, left: b.offsetLeft + e.x * S.z - st.clientWidth / 3, behavior: "smooth" }); }
+
+async function downloadAll(btn) {
+  const fmt = pref("fmt") || "svg";
+  await withBusy(btn, async () => {
+    const files = [];
+    toast(`Preparando el kit completo en ${fmt.toUpperCase()}… puede tardar un minuto.`);
+    files.push({ name: "kit-ui-govco-v9.2.pdf", data: await fetch("data/kit-ui-govco-v9.2.pdf").then(r => r.blob()) });
+    for (let n = 1; n <= 37; n++) { btn.textContent = `Mesa ${n}/37…`; for (const f of await pageAssets(n, fmt, "mesas/")) files.push(f); }
+    files.push({ name: "variables/variables.css", data: tokensCss() }, { name: "variables/tokens.json", data: JSON.stringify(tokensJson(), null, 2) });
+    files.push({ name: "LEEME.txt", data: "Kit UI GOV.CO 9.2 — paquete generado por un visor NO OFICIAL de consulta.\nFuente: PDF oficial del MinTIC (https://www.mintic.gov.co/portal/715/articles-406089_recurso_1.pdf).\nLos vectores, colores y textos se toman sin modificar del PDF.\n" });
+    btn.textContent = "Comprimiendo…";
+    const z = await zipOf(files, `kit-ui-govco-9.2-${fmt}.zip`); await save(z.name, z.data);
+  });
+}
+
+/* ---------------------------------------------------------------- arranque */
+async function boot() {
+  S.color = pref("color") || "hex"; S.unit = pref("unit") || "px"; S.showNb = pref("nb") !== "0";
+  wire();
+  const [kit, states, logos] = await Promise.all([getJSON("data/kit.json"), getJSON("data/states.json").catch(() => []), getJSON("data/logos.json").catch(() => [])]);
+  S.kit = kit; S.states = states; S.logos = logos;
+  const co = await getJSON("data/p33.json"); const coEl = co.els.find(e => e.k === "image" && Math.abs(e.w - 219) < 2); S.coImg = coEl ? coEl.src.slice(4) : null;
+  renderList();
+  const h = location.hash.slice(1);
+  const m = /^m(\d+)$/.exec(h);
+  S.z = 0.5;
+  await openBoard(m ? +m[1] : 1);
+  S.z = fitZ(); applyZoom();
+  if (h === "recursos") setView("res");
+}
+if (location.hostname === "localhost") window.__kit = { S, regionSVG, render, boardFile, iconFile, logoFile, pageAssets, zipOf, tokensCss, rectOf };
+boot().catch(err => { console.error(err); $("#art").innerHTML = `<div class="loading">No se pudieron cargar los datos del kit (${esc(err.message)}).</div>`; });
+})();
+</script>
+</body></html>
